@@ -15,7 +15,12 @@ pub fn git(root: &Path, command: &str) -> Result<String, ToolErrors> {
         .output()
         .map_err(|e| ToolErrors::Git(format!("Failed to execute git: {}", e)))?;
     if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).to_string())
+        let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+        if stdout.trim().is_empty() {
+            Ok("Operation Done.".to_string())
+        } else {
+            Ok(stdout)
+        }
     } else {
         let stderr = String::from_utf8_lossy(&output.stderr);
         Err(ToolErrors::Git(format!("Git error: {}", stderr)))

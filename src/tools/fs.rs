@@ -72,7 +72,7 @@ pub fn write_file(root: &Path, path: &str, content: &str) -> Result<String, Tool
     }
     fs::write(&full, content)
         .map_err(|e| ToolErrors::Io(e))?;
-    Ok("OK".to_string())
+    Ok("Written".to_string())
 }
 
 pub fn rm_file(root: &Path, path: &str) -> Result<String, ToolErrors> {
