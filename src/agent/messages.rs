@@ -7,21 +7,22 @@ use async_openai::types::chat::{
     ChatCompletionRequestToolMessage,
     ChatCompletionRequestToolMessageContent,
     ChatCompletionRequestAssistantMessageArgs,
+    ChatCompletionRequestSystemMessage,
+    ChatCompletionRequestSystemMessageContent,
 };
 use async_openai::types::chat::ChatCompletionMessageToolCalls;
 use crate::history::Conversation;
 use crate::llm::LLMResponse;
+use std::fs;
 
-pub fn build_messages_to_be_passed(
-    selected_history: &[ChatCompletionRequestMessage],
-    conversation: &Conversation,
-    new_request_messages: &[ChatCompletionRequestMessage],
-) -> Vec<ChatCompletionRequestMessage> {
-    let mut messages = Vec::new();
-    messages.extend_from_slice(selected_history);
-    messages.extend(conversation.messages.clone());
-    messages.extend_from_slice(new_request_messages);
-    messages
+pub fn load_system_message() -> ChatCompletionRequestMessage {
+    let content = fs::read_to_string("prompts/system.txt")
+        .expect("Failed to read prompts/system.txt");
+    let system_msg = ChatCompletionRequestSystemMessage {
+        content: ChatCompletionRequestSystemMessageContent::Text(content),
+        name: None,
+    };
+    ChatCompletionRequestMessage::System(system_msg)
 }
 
 pub fn string_to_message(s: String) -> ChatCompletionRequestMessage {

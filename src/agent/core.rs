@@ -9,7 +9,7 @@ use super::messages::{
     conversation_update,
     build_tool_message,
     build_refusal_message,
-    build_messages_to_be_passed,
+    load_system_message,
 };
 use super::executor::{parse_tool, execute_tool};
 
@@ -19,15 +19,11 @@ impl Agent {
 
         let mut new_request_messages: Vec<ChatCompletionRequestMessage> = Vec::new();
         let mut messages_to_be_passed: Vec<ChatCompletionRequestMessage> = Vec::new();
-
+        messages_to_be_passed.push(load_system_message());
+        messages_to_be_passed.extend_from_slice(&self.selected_history);
         let query_msg = string_to_message(self.query.clone());
         push_element(&mut new_request_messages, &mut messages_to_be_passed, query_msg);
 
-        messages_to_be_passed = build_messages_to_be_passed(
-            &self.selected_history,
-            &self.conversation,
-            &new_request_messages,
-        );
 
         loop {
             let new_response_message = self.llm.chat(&messages_to_be_passed).await;
