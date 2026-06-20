@@ -139,7 +139,13 @@ async fn handle_query(state: Arc<Mutex<AppState>>) -> Result<()> {
         let input = input.trim();
 
         if input.is_empty() || input == "n" {
-            break Vec::new();
+            let all_uuids: Vec<String> = history
+            .list_conversations()
+            .into_iter()
+            .map(|(id, _, _)| id)
+            .collect();
+
+            break history.prepare_for_llm(&all_uuids);
         } else if input == "y" {
             break select_history(&mut history).await?;
         } else {

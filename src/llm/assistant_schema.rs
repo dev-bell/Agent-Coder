@@ -5,10 +5,10 @@ pub const ASSISTANT_RESPONSE_SCHEMA: &str = r#"{
         "type": "object",
         "properties": {
             "Thought": { "type": "string" },
-            "Action": { "anyOf":{{"type": "string"}, {"type":"null"}} },
-            "Final Answer": { "anyOf":{{"type": "string"}, {"type:"null"}} }
+            "Action": { "type": ["string", "null"] },
+            "Final Answer": { "type": ["string", "null"] }
         },
-        "required": ["Thought"],
+        "required": ["Thought", "Action", "Final Answer"],
         "additionalProperties": false
     }
 }"#;
