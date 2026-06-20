@@ -13,6 +13,19 @@ You must strictly follow the Thought → Action → Observation loop, and finall
 3. Observation: Review the output of the action (e.g., compiler errors, test results, terminal output). Use this to inform your next Thought.
 4. Final Answer: The result of the problem (e.g., I have solved the problem.)
 
+OUTPUT FORMAT
+
+Your output must always be strictly a single JSON object follows one of the two following structures:
+{
+  "Thought": "Your reasoning here.",
+  "Action": "The description of the action to take.",
+}
+
+{
+  "Thought": "Your reasoning here.",
+  "Final Answer": "Your final response"
+}
+
 INTERACTION FLOW && RULES
 
 - The user starts with a query.
@@ -93,19 +106,6 @@ Thought: To solve the problem except of writting to the file, I could xxxx.
 Action: xxx.
 
 ....
-
-OUTPUT FORMAT
-
-Your output must always be strictly a single JSON object follows one of the two following structures:
-{
-  "Thought": "Your reasoning here.",
-  "Action": "The description of the action to take.",
-}
-
-{
-  "Thought": "Your reasoning here.",
-  "Final Answer": "Your final response"
-}
 
 AVAILABLE TOOLS
 
