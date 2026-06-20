@@ -83,14 +83,29 @@ impl Agent {
                             messages_to_be_passed.push(assistant_msg);
 
                             if let Some(obj) = response.content.as_object() {
-                                for (key, value) in obj {
-                                    if !value.is_null() {
-                                        let content_str = if value.is_string() {
-                                            value.as_str().unwrap_or("").to_string()
-                                        } else {
-                                            value.to_string()
-                                        };
-                                        console::log_assistant_field(key, &content_str);
+                                for key in &["Thought", "Action", "Final Answer"] {
+                                    if let Some(value) = obj.get(*key) {
+                                        if !value.is_null() {
+                                            let content_str = if value.is_string() {
+                                                value.as_str().unwrap_or("").to_string()
+                                            } else {
+                                                value.to_string()
+                                            };
+                                            console::log_assistant_field(key, &content_str);
+                                        }
+                                    }
+                                }
+
+                                for (key, value) in obj.iter() {
+                                    if key != "Thought" && key != "Action" && key != "Final Answer" {
+                                        if !value.is_null() {
+                                            let content_str = if value.is_string() {
+                                                value.as_str().unwrap_or("").to_string()
+                                            } else {
+                                                value.to_string()
+                                            };
+                                            console::log_assistant_field(key, &content_str);
+                                        }
                                     }
                                 }
                             }
@@ -174,14 +189,29 @@ impl Agent {
                             messages_to_be_passed.push(assistant_msg);
 
                             if let Some(obj) = response.content.as_object() {
-                                for (key, value) in obj {
-                                    if !value.is_null() {
-                                        let content_str = if value.is_string() {
-                                            value.as_str().unwrap_or("").to_string()
-                                        } else {
-                                            value.to_string()
-                                        };
-                                        console::log_assistant_field(key, &content_str);
+                                for key in &["Thought", "Action", "Final Answer"] {
+                                    if let Some(value) = obj.get(*key) {
+                                        if !value.is_null() {
+                                            let content_str = if value.is_string() {
+                                                value.as_str().unwrap_or("").to_string()
+                                            } else {
+                                                value.to_string()
+                                            };
+                                            console::log_assistant_field(key, &content_str);
+                                        }
+                                    }
+                                }
+
+                                for (key, value) in obj.iter() {
+                                    if key != "Thought" && key != "Action" && key != "Final Answer" {
+                                        if !value.is_null() {
+                                            let content_str = if value.is_string() {
+                                                value.as_str().unwrap_or("").to_string()
+                                            } else {
+                                                value.to_string()
+                                            };
+                                            console::log_assistant_field(key, &content_str);
+                                        }
                                     }
                                 }
                             }
