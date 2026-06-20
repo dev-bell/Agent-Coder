@@ -14,8 +14,6 @@ pub struct LLMClient {
 
 pub struct LLMResponse {
     pub status: String,
-    pub extra_fields: Option<Vec<String>>,
-    pub unformatted_fields: Option<Vec<String>>,
     pub content: serde_json::Value,
     pub tool_calls: Option<Vec<ChatCompletionMessageToolCall>>,
 }

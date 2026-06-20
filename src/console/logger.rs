@@ -8,18 +8,6 @@ pub fn log_user_observation(observation: &str) {
     println!("user: [Observation] {}", observation);
 }
 
-pub fn log_assistant_thought(thought: &str) {
-    println!("assistant: [Thought] {}", thought);
-}
-
-pub fn log_assistant_action(action_desc: &str) {
-    println!("assistant: [Action] {}", action_desc);
-}
-
-pub fn log_assistant_final_answer(answer: &str) {
-    println!("assistant: [Final Answer] {}", answer);
-}
-
 pub fn log_assistant_field(field_name: &str, field_content: &str) {
     println!("assistant: [{}] {}", field_name, field_content);
 }
@@ -33,7 +21,12 @@ pub fn log_agent_info(info: &str) {
 }
 
 pub fn log_agent_new() {
-    print!("agent: [new]: ");
+    print!("agent: [New] ");
+    io::stdout().flush().unwrap();
+}
+
+pub fn log_agent_new_with_quit() {
+    print!("agent: [New](Enter for quit) ");
     io::stdout().flush().unwrap();
 }
 
@@ -49,11 +42,6 @@ pub fn log_tool_call_rejected(tool_name: &str, args: &str) {
     );
 }
 
-pub fn print_confirmation_continue() {
-    print!("agent: [Confirmation] Would you like to continue?(y/n) ");
-    io::stdout().flush().unwrap();
-}
-
 pub fn print_confirmation_tool_execution(tool_name: &str, args: &str) {
     print!(
         "agent: [Confirmation] The assistant is trying to call {}({}), would you like to execute?(y/n) ",
@@ -63,11 +51,11 @@ pub fn print_confirmation_tool_execution(tool_name: &str, args: &str) {
 }
 
 pub fn print_confirmation_retry() {
-    print!("agent: [Confirmation] Do you want to retry?(y/n/q) ");
+    print!("agent: [Confirmation] Would you like to retry?(y/n) ");
     io::stdout().flush().unwrap();
 }
 
-pub fn print_confirmation_ask_reason() {
-    print!("agent: [Confirmation] Would you like to ask the reason?(y/n/q) ");
+pub fn print_confirmation_append() {
+    print!("agent: [Confirmation] Would you like to append message to it?(y/n/q) ");
     io::stdout().flush().unwrap();
 }

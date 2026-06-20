@@ -30,107 +30,30 @@ pub fn parse_response(response: CreateChatCompletionResponse) -> Result<LLMRespo
             .collect()
     });
 
-    let (status, extra_fields, unformatted_fields, content) = match serde_json::from_str::<Value>(&content_str) {
+    let (status, content) = match serde_json::from_str::<Value>(&content_str) {
         Ok(json_value) => {
             if let Some(obj) = json_value.as_object() {
-                let allowed = ["Thought", "Action", "Final Answer"];
+                let has_final = obj
+                    .get("Final Answer")
+                    .map(|v| !v.is_null())
+                    .unwrap_or(false);
 
-                let has_action = obj.contains_key("Action");
-                let has_final = obj.contains_key("Final Answer");
-                if has_action && has_final {
-                    return Ok(LLMResponse {
-                        status: "Both Action and Final Answer are detected".to_string(),
-                        extra_fields: None,
-                        unformatted_fields: None,
-                        content: json_value.clone(),
-                        tool_calls,
-                    });
+                if has_final {
+                    ("Final Answer Detected".to_string(), json_value.clone())
+                } else {
+                    ("Final Answer Not Detected".to_string(), json_value.clone())
                 }
-
-                let extra: Vec<String> = obj
-                    .keys()
-                    .filter(|k| !allowed.contains(&k.as_str()))
-                    .map(|s| s.to_string())
-                    .collect();
-                if !extra.is_empty() {
-                    return Ok(LLMResponse {
-                        status: "Extra Field".to_string(),
-                        extra_fields: Some(extra),
-                        unformatted_fields: None,
-                        content: json_value.clone(),
-                        tool_calls,
-                    });
-                }
-
-                if obj.is_empty() {
-                    return Ok(LLMResponse {
-                        status: "No fields".to_string(),
-                        extra_fields: None,
-                        unformatted_fields: None,
-                        content: json_value.clone(),
-                        tool_calls,
-                    });
-                }
-
-                if !obj.contains_key("Thought") {
-                    return Ok(LLMResponse {
-                        status: "Missing Thought".to_string(),
-                        extra_fields: None,
-                        unformatted_fields: None,
-                        content: json_value.clone(),
-                        tool_calls,
-                    });
-                }
-
-                let has_action = obj.contains_key("Action");
-                let has_final = obj.contains_key("Final Answer");
-                if !has_action && !has_final {
-                    return Ok(LLMResponse {
-                        status: "Missing Action or Final Answer".to_string(),
-                        extra_fields: None,
-                        unformatted_fields: None,
-                        content: json_value.clone(),
-                        tool_calls,
-                    });
-                }
-
-                let mut unformatted = Vec::new();
-                for field in allowed.iter() {
-                    if let Some(value) = obj.get(*field) {
-                        if !value.is_string() {
-                            unformatted.push(field.to_string());
-                        }
-                    }
-                }
-                if !unformatted.is_empty() {
-                    return Ok(LLMResponse {
-                        status: "Unformatted Fields".to_string(),
-                        extra_fields: None,
-                        unformatted_fields: Some(unformatted),
-                        content: json_value.clone(),
-                        tool_calls,
-                    });
-                }
-
-                (
-                    "Well-formatted".to_string(),
-                    None,
-                    None,
-                    json_value.clone(),
-                )
             } else {
-                ("Not JSON".to_string(), None, None, Value::String(content_str))
+                ("Not JSON".to_string(), Value::String(content_str))
             }
         }
         Err(_) => {
-            ("Not JSON".to_string(), None, None, Value::String(content_str))
+            ("Not JSON".to_string(), Value::String(content_str))
         }
     };
 
     Ok(LLMResponse {
         status,
-        extra_fields,
-        unformatted_fields,
         content,
         tool_calls,
     })

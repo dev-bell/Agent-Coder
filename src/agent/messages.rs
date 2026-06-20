@@ -6,7 +6,6 @@ use async_openai::types::chat::{
     ChatCompletionRequestAssistantMessageContent,
     ChatCompletionRequestToolMessage,
     ChatCompletionRequestToolMessageContent,
-    ChatCompletionRequestAssistantMessageArgs,
     ChatCompletionRequestSystemMessage,
     ChatCompletionRequestSystemMessageContent,
 };
@@ -71,7 +70,6 @@ pub fn conversation_update(
     });
     let assistant_msg = ChatCompletionRequestMessage::Assistant(ChatCompletionRequestAssistantMessage {
         content: Some(ChatCompletionRequestAssistantMessageContent::Text(content_str)),
-        name: None,
         tool_calls: tool_calls_enum,
         ..Default::default()
     });
@@ -85,10 +83,18 @@ pub fn build_tool_message(output: String, tool_call_id: String) -> ChatCompletio
     })
 }
 
-pub fn build_refusal_message(refusal: &str) -> ChatCompletionRequestMessage {
-    let assistant_msg = ChatCompletionRequestAssistantMessageArgs::default()
-        .refusal(refusal.to_string())
-        .build()
-        .expect("Failed to build refusal message");
-    ChatCompletionRequestMessage::Assistant(assistant_msg)
+pub fn build_assistant_message(response: &LLMResponse) -> ChatCompletionRequestMessage {
+    let content_str = response.content.to_string();
+    let tool_calls_enum = response.tool_calls.as_ref().map(|tc_vec| {
+        tc_vec
+            .iter()
+            .map(|tc| ChatCompletionMessageToolCalls::Function(tc.clone()))
+            .collect()
+    });
+
+    ChatCompletionRequestMessage::Assistant(ChatCompletionRequestAssistantMessage {
+        content: Some(ChatCompletionRequestAssistantMessageContent::Text(content_str)),
+        tool_calls: tool_calls_enum,
+        ..Default::default()
+    })
 }
