@@ -14,8 +14,8 @@ pub enum ToolErrors {
     Pattern(String),
     #[error("Grep error: {0}")]
     Grep(String),
-    #[error("Missing argument: {0}")]
-    MissingArgument(String),
+    #[error("Invalid argument: {0}")]
+    InvalidArgument(String),
     #[error("Invalid operation: {0}")]
     InvalidOperation(String),
 }

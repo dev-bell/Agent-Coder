@@ -13,7 +13,6 @@ pub struct LLMClient {
 }
 
 pub struct LLMResponse {
-    pub status: String,
-    pub content: serde_json::Value,
+    pub content: String,
     pub tool_calls: Option<Vec<ChatCompletionMessageToolCall>>,
 }

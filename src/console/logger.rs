@@ -5,7 +5,7 @@ pub fn log_user_query(query: &str) {
 }
 
 pub fn log_user_observation(observation: &str) {
-    println!("user: [Observation] {}", observation);
+    println!("user: [Observation]\n{}", observation);
 }
 
 pub fn log_assistant_field(field_name: &str, field_content: &str) {
@@ -20,18 +20,18 @@ pub fn log_agent_info(info: &str) {
     println!("agent: [Info] {}", info);
 }
 
-pub fn log_agent_new() {
-    print!("agent: [New] ");
+pub fn log_agent_new_with_type_quit() {
+    print!("agent [New](Enter \"/quit\" to quit): ");
     io::stdout().flush().unwrap();
 }
 
-pub fn log_agent_new_with_quit() {
-    print!("agent: [New](Enter for quit) ");
+pub fn log_agent_new_with_enter_as_quit() {
+    print!("agent [New](Enter to quit): ");
     io::stdout().flush().unwrap();
 }
 
 pub fn log_reason_prompt() {
-    print!("agent: [Reason](Could be empty): ");
+    print!("agent: [Reason](Enter to skip): ");
     io::stdout().flush().unwrap();
 }
 
@@ -44,18 +44,13 @@ pub fn log_tool_call_rejected(tool_name: &str, args: &str) {
 
 pub fn print_confirmation_tool_execution(tool_name: &str, args: &str) {
     print!(
-        "agent: [Confirmation] The assistant is trying to call {}({}), would you like to execute?(y/n) ",
+        "agent: [Confirmation] The assistant is trying to call {}({}), would you like to execute?(y/n)",
         tool_name, args
     );
     io::stdout().flush().unwrap();
 }
 
 pub fn print_confirmation_retry() {
-    print!("agent: [Confirmation] Would you like to retry?(y/n) ");
-    io::stdout().flush().unwrap();
-}
-
-pub fn print_confirmation_append() {
-    print!("agent: [Confirmation] Would you like to append message to it?(y/n/q) ");
+    print!("agent: [Confirmation] Would you like to retry?(y/n)");
     io::stdout().flush().unwrap();
 }

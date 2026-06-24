@@ -3,10 +3,6 @@ use super::structs::{Conversation, History};
 use super::HistoryErrors;
 
 impl Conversation {
-    pub fn add_message(&mut self, msg: ChatCompletionRequestMessage) {
-        self.messages.push(msg);
-    }
-
     pub fn delete_message(&mut self, index: usize) -> Result<(), HistoryErrors> {
         if index < self.messages.len() {
             self.messages.remove(index);

@@ -27,60 +27,60 @@ pub fn execute_tool(
             let path = args
                 .get("path")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("path".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("path".to_string()))?;
             let mode = args
                 .get("mode")
                 .and_then(|v| v.as_u64())
                 .map(|v| v as u8)
-                .ok_or_else(|| ToolErrors::MissingArgument("mode".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("mode".to_string()))?;
             list_files(root, path, mode)
         }
         "read_file" => {
             let path = args
                 .get("path")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("path".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("path".to_string()))?;
             read_file(root, path)
         }
         "write_file" => {
             let path = args
                 .get("path")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("path".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("path".to_string()))?;
             let content = args
                 .get("content")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("content".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("content".to_string()))?;
             write_file(root, path, content)
         }
         "rm_file" => {
             let path = args
                 .get("path")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("path".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("path".to_string()))?;
             rm_file(root, path)
         }
         "grep" => {
             let path = args
                 .get("path")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("path".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("path".to_string()))?;
             let pattern = args
                 .get("pattern")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("pattern".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("pattern".to_string()))?;
             let case_flag = args
                 .get("case_flag")
                 .and_then(|v| v.as_u64())
                 .map(|v| v as u8)
-                .ok_or_else(|| ToolErrors::MissingArgument("case_flag".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("case_flag".to_string()))?;
             grep(root, path, pattern, case_flag)
         }
         "git" => {
             let command = args
                 .get("command")
                 .and_then(|v| v.as_str())
-                .ok_or_else(|| ToolErrors::MissingArgument("command".to_string()))?;
+                .ok_or_else(|| ToolErrors::InvalidArgument("command".to_string()))?;
             git(root, command)
         }
         _ => Err(ToolErrors::InvalidOperation(format!(
