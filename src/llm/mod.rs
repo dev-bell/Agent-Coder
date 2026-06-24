@@ -15,5 +15,5 @@ pub use tools_schema::{
 };
 pub use structs::{LLMClient, LLMResponse};
 pub use errors::LLMErrors;
-pub use builder::{build_request, tools_available, content_response_format};
+pub use builder::{build_request, tools_available};
 pub use parser::parse_response;

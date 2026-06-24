@@ -2,7 +2,7 @@ use async_openai::Client;
 use async_openai::config::OpenAIConfig;
 use async_openai::types::chat::{ChatCompletionRequestMessage};
 use std::env;
-use super::{build_request, tools_available, content_response_format, parse_response, LLMClient, LLMResponse, LLMErrors};
+use super::{build_request, tools_available, parse_response, LLMClient, LLMResponse, LLMErrors};
 
 impl LLMClient {
     pub fn new() -> Self {
@@ -14,15 +14,14 @@ impl LLMClient {
             .with_api_base(base_url);
         let client = Client::with_config(config);
         let tools = tools_available();
-        let response_format = content_response_format();
-        Self { client, model, tools, response_format }
+        Self { client, model, tools}
     }
 
     pub async fn chat(
         &self,
         messages: &Vec<ChatCompletionRequestMessage>,
     ) -> Result<LLMResponse, LLMErrors> {
-        let request = build_request(&self.model, messages, &self.tools, &self.response_format)?;
+        let request = build_request(&self.model, messages, &self.tools)?;
         let response = self.client
             .chat()
             .create(request)

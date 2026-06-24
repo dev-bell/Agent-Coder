@@ -7,7 +7,7 @@ use async_openai::{
             CreateChatCompletionRequestArgs,
             ChatCompletionRequestMessage
         },
-        assistants::{FunctionObject, ResponseFormat},
+        assistants::{FunctionObject},
     }
 };
 use super::{
@@ -61,22 +61,16 @@ pub fn tools_available() -> Option<Vec<ChatCompletionTools>> {
     ])
 }
 
-pub fn content_response_format() -> Option<ResponseFormat> {
-    Some(ResponseFormat::JsonObject)
-}
-
 pub fn build_request(
     model: &String,
     messages: &Vec<ChatCompletionRequestMessage>,
     tools: &Option<Vec<ChatCompletionTools>>,
-    response_format: &Option<ResponseFormat>,
 ) -> Result<CreateChatCompletionRequest, LLMErrors> {
     Ok(
         CreateChatCompletionRequestArgs::default()
             .model(model.clone())
             .messages(messages.clone())
             .tools(tools.as_ref().cloned().unwrap())
-            .response_format(response_format.as_ref().cloned().unwrap())
             .build()?
     )
 }
