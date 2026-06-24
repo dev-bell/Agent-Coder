@@ -17,7 +17,6 @@ use super::{
     RM_FILE_SCHEMA,
     GREP_SCHEMA,
     GIT_SCHEMA,
-    ASSISTANT_RESPONSE_SCHEMA,
 };
 use super::LLMErrors;
 
@@ -63,8 +62,7 @@ pub fn tools_available() -> Option<Vec<ChatCompletionTools>> {
 }
 
 pub fn content_response_format() -> Option<ResponseFormat> {
-    let response_json_schema = serde_json::from_str(ASSISTANT_RESPONSE_SCHEMA).expect("Invalid ASSISTANT_RESPONSE_SCHEMA JSON");
-    Some(ResponseFormat::JsonSchema { json_schema:response_json_schema })
+    Some(ResponseFormat::JsonObject)
 }
 
 pub fn build_request(

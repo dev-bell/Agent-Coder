@@ -1,4 +1,3 @@
-mod assistant_schema;
 mod tools_schema;
 mod structs;
 mod errors;
@@ -6,7 +5,6 @@ mod builder;
 mod parser;
 mod chat;
 
-pub use assistant_schema::ASSISTANT_RESPONSE_SCHEMA;
 pub use tools_schema::{
     GIT_SCHEMA,
     GREP_SCHEMA,

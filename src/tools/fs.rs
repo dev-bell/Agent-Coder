@@ -1,57 +1,40 @@
 use std::fs;
-use std::path::{Path, PathBuf};
-use serde_json::json;
+use std::path::{Path};
+use walkdir::{WalkDir};
 use super::ToolErrors;
-
-fn resolve_path(root: &Path, path: &str) -> Result<PathBuf, ToolErrors> {
-    if !path.starts_with("./") {
-        return Err(ToolErrors::InvalidPath(
-            format!("Path must start with './', got: {}", path)
-        ));
-    }
-    let stripped = path.trim_start_matches("./");
-    let full = root.join(stripped);
-    full.canonicalize()
-        .map_err(|_| ToolErrors::InvalidPath(format!("Path does not exist: {}", path)))
-}
+use super::{resolve_path, is_hidden};
 
 /// List files.
-/// mode: 1 = recursive (tree JSON), 2 = non‑recursive (flat list JSON)
+/// mode: 1 = recursive, 2 = non‑recursive
 pub fn list_files(root: &Path, path: &str, mode: u8) -> Result<String, ToolErrors> {
     let dir = resolve_path(root, path)?;
     if !dir.is_dir() {
         return Err(ToolErrors::InvalidPath(format!("Not a directory: {}", path)));
     }
 
-    fn walk(dir: &Path, root: &Path, recursive: bool) -> Result<Vec<serde_json::Value>, ToolErrors> {
-        let mut items = Vec::new();
-        for entry in fs::read_dir(dir)? {
-            let entry = entry?;
-            let name = entry.file_name().to_string_lossy().to_string();
-            let file_type = entry.file_type()?;
-            let is_dir = file_type.is_dir();
+    let max_depth = if mode == 1 { usize::MAX } else { 1 };
+    let mut results = Vec::new();
+    let walker = WalkDir::new(&dir).max_depth(max_depth).into_iter();
 
-            if recursive && is_dir {
-                let children = walk(&entry.path(), root, true)?;
-                items.push(json!({
-                    "name": name,
-                    "type": "directory",
-                    "children": children
-                }));
-            } else {
-                items.push(json!({
-                    "name": name,
-                    "type": if is_dir { "directory" } else { "file" }
-                }));
+    for entry in walker.filter_entry(|e| !is_hidden(e)) {
+        let entry = match entry {
+            Ok(e) => e,
+            Err(e) => {
+                eprintln!("warning: cannot read entry: {}", e);
+                continue;
             }
-        }
-        items.sort_by(|a, b| a["name"].as_str().cmp(&b["name"].as_str()));
-        Ok(items)
+        };
+        let path = entry.path();
+        let rel = match path.strip_prefix(&root) {
+            Ok(rel) => rel,
+            Err(_) => continue,
+        };
+        let rel_str = rel.to_str().unwrap_or("").replace('\\', "/");
+        let output = format!("./{}", rel_str);
+        results.push(output);
     }
 
-    let recursive = mode == 1;
-    let items = walk(&dir, root, recursive)?;
-    Ok(serde_json::to_string_pretty(&items)?)
+    Ok(results.join("\n"))
 }
 
 pub fn read_file(root: &Path, path: &str) -> Result<String, ToolErrors> {

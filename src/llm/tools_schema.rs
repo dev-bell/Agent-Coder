@@ -28,7 +28,7 @@ pub const LIST_FILES_SCHEMA: &str = r#"{
       },
       "mode": {
         "type": "integer",
-        "description": "Mode 1 returns recursive tree (all subdirectories), Mode 2 returns flat list of immediate children only.",
+        "description": "Mode 1 list files recursively (with all subdirectories), Mode 2 returns flat list of immediate children only.",
         "enum": [1, 2]
       }
     },
@@ -109,7 +109,7 @@ pub const GREP_SCHEMA: &str = r#"{
       },
       "case_flag": {
         "type": "integer",
-        "description": "0 = case-sensitive, 1 = case-insensitive.",
+        "description": "1 = case-sensitive, 0 = case-insensitive.",
         "enum": [0, 1]
       }
     },
