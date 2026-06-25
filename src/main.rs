@@ -16,6 +16,7 @@ use async_openai::types::chat::{
     ChatCompletionRequestUserMessageContent,
     ChatCompletionRequestAssistantMessageContent,
     ChatCompletionRequestToolMessageContent,
+    ChatCompletionMessageToolCalls
 };
 
 use llm::LLMClient;
@@ -192,7 +193,9 @@ async fn select_history(history: &mut History) -> Result<Vec<ChatCompletionReque
     println!("Available conversations:");
     let mut id_map = Vec::new();
     for (idx, (id, time, query)) in convs.iter().enumerate() {
-        println!("{}: {} | {} | {}", idx, id, time, query);
+        let msg_count = history.get_conversation(id).map(|c| c.messages.len()).unwrap_or(0);
+        let formatted_time = time.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M:%S");
+        println!("Conversation {}: | uuid:{} | {} | {} ({} messages count)", idx, id, formatted_time, query, msg_count);
         id_map.push((idx, id.clone()));
     }
 
@@ -363,7 +366,8 @@ async fn history_manage_mode(state: Arc<Mutex<AppState>>) -> Result<()> {
                     } else {
                         for (idx, (id, time, query)) in convs.iter().enumerate() {
                             let msg_count = history.get_conversation(id).map(|c| c.messages.len()).unwrap_or(0);
-                            println!("{}: {} | {} | {} ({} messages)", idx, id, time, query, msg_count);
+                            let formatted_time = time.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M:%S");
+                            println!("Conversation {}: | uuid:{} | {} | {} ({} messages count)", idx, id, formatted_time, query, msg_count);
                         }
                     }
                 }
@@ -374,30 +378,46 @@ async fn history_manage_mode(state: Arc<Mutex<AppState>>) -> Result<()> {
                             let convs = history.list_conversations();
                             if let Some((_, (id, _, _))) = convs.iter().enumerate().find(|(i, _)| *i == idx) {
                                 if let Some(conv) = history.get_conversation(id) {
-                                    println!("Conversation {}: {}", idx, conv.query);
-                                    for (msg_idx, msg) in conv.messages.iter().enumerate() {
-                                        let content = match msg {
+                                    for (idx, msg) in conv.messages.iter().enumerate() {
+                                        println!("Message {}:", idx);
+                                        match msg {
                                             ChatCompletionRequestMessage::User(u) => {
-                                                match &u.content {
+                                                let content = match &u.content {
                                                     ChatCompletionRequestUserMessageContent::Text(t) => t.as_str(),
                                                     _ => "[complex content]",
-                                                }
+                                                };
+                                                println!("User [Message]:\n{}\n", content);
                                             }
                                             ChatCompletionRequestMessage::Assistant(a) => {
-                                                a.content.as_ref().map(|c| match c {
-                                                    ChatCompletionRequestAssistantMessageContent::Text(t) => t.as_str(),
-                                                    _ => "[complex]",
-                                                }).unwrap_or("[no content]")
-                                            }
-                                            ChatCompletionRequestMessage::Tool(t) => {
-                                                match &t.content {
-                                                    ChatCompletionRequestToolMessageContent::Text(s) => s.as_str(),
-                                                    _ => "[complex]",
+                                                if let Some(content) = &a.content {
+                                                    let text = match content {
+                                                        ChatCompletionRequestAssistantMessageContent::Text(t) => t.as_str(),
+                                                        _ => "[complex]",
+                                                    };
+                                                    if !text.trim().is_empty() {
+                                                        println!("Assistant [Message]:\n{}\n", text);
+                                                    }
+                                                }
+                                                if let Some(tool_calls) = &a.tool_calls {
+                                                    for tool_call in tool_calls {
+                                                        if let ChatCompletionMessageToolCalls::Function(f) = tool_call {
+                                                            println!(
+                                                                "Assistant [Tool Call]:\n{}({})\n",
+                                                                f.function.name, f.function.arguments
+                                                            );
+                                                        }
+                                                    }
                                                 }
                                             }
-                                            _ => "[other]",
-                                        };
-                                        println!("  {}: {}", msg_idx, content);
+                                            ChatCompletionRequestMessage::Tool(t) => {
+                                                let content = match &t.content {
+                                                    ChatCompletionRequestToolMessageContent::Text(s) => s.as_str(),
+                                                    _ => "[complex]",
+                                                };
+                                                println!("User [Observation]:\n{}\n", content);
+                                            }
+                                            _ => {}
+                                        }
                                     }
                                 } else {
                                     println!("Conversation not found.");
