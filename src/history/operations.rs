@@ -1,5 +1,5 @@
 use async_openai::types::chat::ChatCompletionRequestMessage;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 use super::structs::{Conversation, History};
 use super::HistoryErrors;
 
@@ -42,7 +42,7 @@ impl History {
         self.conversations.iter().find(|c| c.id == conv_id)
     }
 
-    pub fn list_conversations(&self) -> Vec<(String, DateTime<Utc>, String)> {
+    pub fn list_conversations(&self) -> Vec<(String, DateTime<Local>, String)> {
         self.conversations
             .iter()
             .map(|c| (c.id.clone(), c.start_time.clone(), c.query.clone()))

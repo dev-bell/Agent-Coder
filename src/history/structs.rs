@@ -1,12 +1,12 @@
 use async_openai::types::chat::ChatCompletionRequestMessage;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Conversation {
     pub id: String,
-    pub start_time: DateTime<Utc>,
+    pub start_time: DateTime<Local>,
     pub query: String,
     pub messages: Vec<ChatCompletionRequestMessage>,
 }
@@ -14,7 +14,7 @@ pub struct Conversation {
 impl Conversation {
     pub fn new(query: &str) -> Self {
         let id = uuid::Uuid::new_v4().to_string();
-        let start_time = Utc::now();
+        let start_time = Local::now();
         Self {
             id,
             start_time,

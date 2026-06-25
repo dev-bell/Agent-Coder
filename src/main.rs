@@ -194,7 +194,7 @@ async fn select_history(history: &mut History) -> Result<Vec<ChatCompletionReque
     let mut id_map = Vec::new();
     for (idx, (id, time, query)) in convs.iter().enumerate() {
         let msg_count = history.get_conversation(id).map(|c| c.messages.len()).unwrap_or(0);
-        let formatted_time = time.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M:%S");
+        let formatted_time = time.format("%Y-%m-%d %H:%M:%S %z");
         println!("Conversation {}: | uuid:{} | {} | {} ({} messages count)", idx, id, formatted_time, query, msg_count);
         id_map.push((idx, id.clone()));
     }
@@ -366,7 +366,7 @@ async fn history_manage_mode(state: Arc<Mutex<AppState>>) -> Result<()> {
                     } else {
                         for (idx, (id, time, query)) in convs.iter().enumerate() {
                             let msg_count = history.get_conversation(id).map(|c| c.messages.len()).unwrap_or(0);
-                            let formatted_time = time.with_timezone(&chrono::Local).format("%Y-%m-%d %H:%M:%S");
+                            let formatted_time = time.format("%Y-%m-%d %H:%M:%S %z");
                             println!("Conversation {}: | uuid:{} | {} | {} ({} messages count)", idx, id, formatted_time, query, msg_count);
                         }
                     }
