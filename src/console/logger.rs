@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use serde_json;
 
 pub fn log_user_query(query: &str) {
     println!("user: [Query] {}", query);
@@ -36,16 +37,56 @@ pub fn log_reason_prompt() {
 }
 
 pub fn log_tool_call_rejected(tool_name: &str, args: &str) {
+    let display_args = if tool_name == "write_file" {
+        match serde_json::from_str::<serde_json::Value>(args) {
+            Ok(mut json) => {
+                if let Some(obj) = json.as_object_mut() {
+                    if obj.contains_key("content") {
+                        obj.insert("content".to_string(), serde_json::Value::String("<complex content>".to_string()));
+                        serde_json::to_string(&json).unwrap_or_else(|_| args.to_string())
+                    } else {
+                        args.to_string()
+                    }
+                } else {
+                    args.to_string()
+                }
+            }
+            Err(_) => args.to_string(),
+        }
+    } else {
+        args.to_string()
+    };
+
     println!(
         "agent: [Info] The tool call {}({}) has been rejected by the user.",
-        tool_name, args
+        tool_name, display_args
     );
 }
 
 pub fn print_confirmation_tool_execution(tool_name: &str, args: &str) {
+    let display_args = if tool_name == "write_file" {
+        match serde_json::from_str::<serde_json::Value>(args) {
+            Ok(mut json) => {
+                if let Some(obj) = json.as_object_mut() {
+                    if obj.contains_key("content") {
+                        obj.insert("content".to_string(), serde_json::Value::String("<complex content>".to_string()));
+                        serde_json::to_string(&json).unwrap_or_else(|_| args.to_string())
+                    } else {
+                        args.to_string()
+                    }
+                } else {
+                    args.to_string()
+                }
+            }
+            Err(_) => args.to_string(),
+        }
+    } else {
+        args.to_string()
+    };
+
     print!(
         "agent: [Confirmation] The assistant is trying to call {}({}), would you like to execute?(y/n)",
-        tool_name, args
+        tool_name, display_args
     );
     io::stdout().flush().unwrap();
 }

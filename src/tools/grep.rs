@@ -7,6 +7,9 @@ use super::{resolve_path, is_hidden};
 
 pub fn grep(root: &Path, path: &str, pattern: &str, case_flag: u8) -> Result<String, ToolErrors> {
     let dir = resolve_path(root, path)?;
+    if !dir.exists() {
+        return Err(ToolErrors::InvalidPath(format!("Path does not exist: {}", path)));
+    }
     if !dir.is_dir() {
         return Err(ToolErrors::InvalidPath(format!("Not a directory: {}", path)));
     }
@@ -38,7 +41,7 @@ pub fn grep(root: &Path, path: &str, pattern: &str, case_flag: u8) -> Result<Str
         let rel_path = match path.strip_prefix(&root) {
             Ok(p) => {
                 let rel_str = p.display().to_string();
-                format!("./{}", rel_str.replace('\\', "/"))
+                format!("{}", rel_str.replace('\\', "/"))
             }
             Err(_) => path.display().to_string(),
         };

@@ -8,6 +8,9 @@ use super::{resolve_path, is_hidden};
 /// mode: 1 = recursive, 2 = non‑recursive
 pub fn list_files(root: &Path, path: &str, mode: u8) -> Result<String, ToolErrors> {
     let dir = resolve_path(root, path)?;
+    if !dir.exists() {
+        return Err(ToolErrors::InvalidPath(format!("Path does not exist: {}", path)));
+    }
     if !dir.is_dir() {
         return Err(ToolErrors::InvalidPath(format!("Not a directory: {}", path)));
     }
@@ -30,7 +33,7 @@ pub fn list_files(root: &Path, path: &str, mode: u8) -> Result<String, ToolError
             Err(_) => continue,
         };
         let rel_str = rel.to_str().unwrap_or("").replace('\\', "/");
-        let output = format!("./{}", rel_str);
+        let output = format!("{}", rel_str);
         results.push(output);
     }
 
@@ -39,6 +42,9 @@ pub fn list_files(root: &Path, path: &str, mode: u8) -> Result<String, ToolError
 
 pub fn read_file(root: &Path, path: &str) -> Result<String, ToolErrors> {
     let full = resolve_path(root, path)?;
+    if !full.exists() {
+        return Err(ToolErrors::InvalidPath(format!("Path does not exist: {}", path)));
+    }
     if !full.is_file() {
         return Err(ToolErrors::InvalidPath(format!("Not a file: {}", path)));
     }
@@ -60,6 +66,9 @@ pub fn write_file(root: &Path, path: &str, content: &str) -> Result<String, Tool
 
 pub fn rm_file(root: &Path, path: &str) -> Result<String, ToolErrors> {
     let full = resolve_path(root, path)?;
+    if !full.exists() {
+        return Err(ToolErrors::InvalidPath(format!("Path does not exist: {}", path)));
+    }
     if full.is_dir() {
         fs::remove_dir_all(&full)
             .map_err(|e| ToolErrors::Io(e))?;

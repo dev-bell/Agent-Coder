@@ -4,16 +4,7 @@ use walkdir::{DirEntry};
 
 /// Resolve Path for auxiliary
 pub fn resolve_path(root: &Path, path: &str) -> Result<PathBuf, ToolErrors> {
-    if !path.starts_with("./") {
-        return Err(ToolErrors::InvalidPath(
-            format!("Path must start with './', got: {}", path)
-        ));
-    }
-    let stripped = path.trim_start_matches("./");
-    let full = root.join(stripped);
-    if !full.exists() {
-        return Err(ToolErrors::InvalidPath(format!("Path does not exist: {}", path)));
-    }
+    let full = root.join(path);
     Ok(full)
 }
 
