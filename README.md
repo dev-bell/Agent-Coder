@@ -2,6 +2,20 @@
 
 Agent-Coder is a Rust-based coding agent that assists programmers with code generation, refactoring, debugging, and project exploration.
 
+## Key Features & Outcomes 🚀
+
+1. **Agentic LLM Interaction**
+   - Implements an agent to help users interact with the LLM and handle tool calling.
+
+2. **Robust Error Handling**
+   - Tool calls require user confirmation and allow explicit rejection reasons to inject feedback into the LLM.
+   - Tool-call errors are also fed back to the LLM for self-correction.
+
+3. **File-Based Context Management**
+   - Stores context on the file system for cross-device migration.
+   - Manages session-level history (view/delete by session or message).
+   - Supports temporarily loading selected history in new conversations without actual deletion.
+
 ## Usage 📖
 
 ### Prerequisites
